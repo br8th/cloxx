@@ -8,16 +8,25 @@
             "name": "WSL Debug",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}\\build\\cloxx",
+            "program": "${workspaceFolder}\\build\\cloxxd",
             "args": [
                 // "--vm",
                 // "${workspaceFolder}/examples/fib.lox",
+            ],
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": false
+                }
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": true,
-            "preLaunchTask": "Build"
+            "preLaunchTask": "build cloxx"
         }
     ]
 }

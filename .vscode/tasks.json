@@ -1,0 +1,26 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build cloxx",
+            "type": "shell",
+            // "command": "echo Hello",
+            "command": "make",
+            "args": [
+                "debug"
+                // "make",
+                // "--directory=${workspaceFolder};",
+                // "make", 
+                // "--directory=${workspaceFolder}/subfolder"
+            ],
+            "group":  {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal":"always"
+            },
+            "problemMatcher": "$msCompile"
+        }
+    ]
+}
