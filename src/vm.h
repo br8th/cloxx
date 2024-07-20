@@ -10,7 +10,7 @@ typedef struct
     Chunk *chunk;
     uint8_t *ip;
     Value stack[STACK_MAX];
-    Value* stackTop;
+    Value *stackTop;
 } VM;
 
 typedef enum
@@ -21,7 +21,7 @@ typedef enum
 } InterpretResult;
 
 void initVM();
-InterpretResult interpret(Chunk *chunk);
+InterpretResult interpret(const char *source);
 void freeVM();
 
 void push(Value value);

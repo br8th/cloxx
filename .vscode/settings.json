@@ -3,6 +3,8 @@
         "chunk.h": "c",
         "common.h": "c",
         "vm.h": "c",
-        "debug.h": "c"
+        "debug.h": "c",
+        "scanner.h": "c",
+        "stddef.h": "c"
     }
 }

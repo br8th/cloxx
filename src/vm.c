@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "common.h"
+#include "compiler.h"
 #include "debug.h"
 #include "vm.h"
 
@@ -55,35 +56,36 @@ static InterpretResult run()
         uint8_t instruction;
         switch (instruction = READ_BYTE())
         {
-            case OP_ADD:
-                BINARY_OP(+);
-                break;
-            case OP_SUBTRACT:
-                BINARY_OP(-);
-                break;
-            case OP_MULTIPLY:
-                BINARY_OP(*);
-                break;
-            case OP_DIVIDE:
-                BINARY_OP(/);
-                break;
-            case OP_CONSTANT:
-            {
-                Value constant = READ_CONSTANT();
-                push(constant);
-                break;
-            }
-            case OP_NEGATE: {
-                // push(-pop());
-                *(vm.stackTop - 1) = -*(vm.stackTop - 1);
-                break;
-            }
-            case OP_RETURN:
-            {
-                printValue(pop());
-                printf("\n");
-                return INTERPRET_OK;
-            }
+        case OP_ADD:
+            BINARY_OP(+);
+            break;
+        case OP_SUBTRACT:
+            BINARY_OP(-);
+            break;
+        case OP_MULTIPLY:
+            BINARY_OP(*);
+            break;
+        case OP_DIVIDE:
+            BINARY_OP(/);
+            break;
+        case OP_CONSTANT:
+        {
+            Value constant = READ_CONSTANT();
+            push(constant);
+            break;
+        }
+        case OP_NEGATE:
+        {
+            // push(-pop());
+            *(vm.stackTop - 1) = -*(vm.stackTop - 1);
+            break;
+        }
+        case OP_RETURN:
+        {
+            printValue(pop());
+            printf("\n");
+            return INTERPRET_OK;
+        }
         }
     }
 
@@ -96,9 +98,8 @@ void freeVM()
 {
 }
 
-InterpretResult interpret(Chunk *chunk)
+InterpretResult interpret(const char *source)
 {
-    vm.chunk = chunk;
-    vm.ip = chunk->code;
-    return run();
+    compile(source);
+    return INTERPRET_OK;
 }

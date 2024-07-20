@@ -3,7 +3,7 @@
 #include "memory.h"
 #include "values.h"
 
-void initChunk(Chunk* chunk)
+void initChunk(Chunk *chunk)
 {
     chunk->count = 0;
     chunk->capacity = 0;
@@ -12,7 +12,7 @@ void initChunk(Chunk* chunk)
     initValueArray(&chunk->constants);
 }
 
-void writeChunk(Chunk* chunk, uint8_t byte, int line)
+void writeChunk(Chunk *chunk, uint8_t byte, int line)
 {
     if (chunk->capacity < chunk->count + 1)
     {
@@ -33,10 +33,10 @@ int addConstant(Chunk *chunk, Value value)
     return chunk->constants.count - 1;
 }
 
-void freeChunk(Chunk* chunk) {
+void freeChunk(Chunk *chunk)
+{
     FREE_ARRAY(uint8_t, chunk->code, chunk->capacity);
     FREE_ARRAY(int, chunk->lines, chunk->capacity);
     freeValueArray(&chunk->constants);
     initChunk(chunk);
 }
-
