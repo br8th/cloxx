@@ -1,4 +1,5 @@
 BUILD_DIR := build
+EXECUTABLES = cloxx cloxxd
 
 default: cloxx
 
@@ -14,5 +15,9 @@ debug:
 
 # Remove all build outputs and intermediate files.
 clean:
-	@ rm -rf $(BUILD_DIR)
-	@ rm cloxx cloxxd
+	@echo "Cleaning up..."
+	@rm -rf $(BUILD_DIR)
+	@for file in $(EXECUTABLES); do \
+        if [ -e $$file ]; then rm $$file; fi; \
+    done
+	@echo "Done."

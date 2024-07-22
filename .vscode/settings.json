@@ -5,6 +5,7 @@
         "vm.h": "c",
         "debug.h": "c",
         "scanner.h": "c",
-        "stddef.h": "c"
+        "stddef.h": "c",
+        "compiler.h": "c"
     }
 }

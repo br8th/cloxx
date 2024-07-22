@@ -4,23 +4,46 @@
         {
             "label": "build cloxx",
             "type": "shell",
-            // "command": "echo Hello",
             "command": "make",
             "args": [
                 "debug"
-                // "make",
-                // "--directory=${workspaceFolder};",
-                // "make", 
-                // "--directory=${workspaceFolder}/subfolder"
             ],
-            "group":  {
+            "group": {
                 "kind": "build",
                 "isDefault": true
             },
             "presentation": {
-                "reveal":"always"
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared",
+                "clear": true,
             },
-            "problemMatcher": "$msCompile"
-        }
+            //"problemMatcher": "$msCompile"
+            "problemMatcher": [
+                "$gcc",
+            ],
+            "detail": "Uses the make file to build cloxx in debug mode."
+            // "options": {
+            //     "cwd": "${fileDirname}"
+            // },
+        },
+        {
+            "label": "clean cloxx",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "clean"
+            ],
+            "group": {
+                "kind": "build",
+            },
+            "presentation": {
+                "reveal": "silent"
+            },
+            "problemMatcher": [
+                "$gcc",
+            ],
+            "detail": "Runs make clean after debug session."
+        },
     ]
 }
