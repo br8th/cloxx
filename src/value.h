@@ -3,7 +3,23 @@
 
 #include "common.h"
 
-typedef double Value;
+// types supported by the Lox VM
+typedef enum
+{
+	VAL_BOOL,
+	VAL_NIL,
+	VAL_NUMBER,
+} ValueType;
+
+typedef struct
+{
+	ValueType type;
+	union
+	{
+		double number;
+		bool boolean;
+	} as;
+} Value;
 
 typedef struct
 {

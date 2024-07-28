@@ -26,7 +26,7 @@
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,
-            "preLaunchTask": "build cloxx",
+            "preLaunchTask": "${defaultBuildTask}",
             "postDebugTask": "clean cloxx"
         }
     ]
