@@ -56,7 +56,7 @@ typedef enum
 typedef struct
 {
     TokenType type;
-    const char *start; // The start relative to the source
+    const char *start;
     int length;
     int line;
 } Token;

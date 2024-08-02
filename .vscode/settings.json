@@ -6,6 +6,9 @@
         "debug.h": "c",
         "scanner.h": "c",
         "stddef.h": "c",
-        "compiler.h": "c"
+        "compiler.h": "c",
+        "object.h": "c",
+        "memory.h": "c",
+        "value.h": "c"
     }
 }
