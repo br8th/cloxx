@@ -27,6 +27,7 @@ struct ObjString
   Obj obj;
   int length;
   char *chars; // The string without quotes, or null byte
+  uint32_t hash;
 };
 
 ObjString *takeString(char *chars, int length);
