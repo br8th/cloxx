@@ -1,14 +1,13 @@
 {
-    "files.associations": {
-        "chunk.h": "c",
-        "common.h": "c",
-        "vm.h": "c",
-        "debug.h": "c",
-        "scanner.h": "c",
-        "stddef.h": "c",
-        "compiler.h": "c",
-        "object.h": "c",
-        "memory.h": "c",
-        "value.h": "c"
-    }
+	"files.associations": {
+		"*.c": "c",
+		"*.h": "c",
+		"Makefile": "makefile"
+	},
+	"editor.detectIndentation": false, // Disable automatic detection of indentation
+	"editor.tabSize": 4, // Set the tab size to your preference, e.g., 4 spaces per tab
+	"editor.insertSpaces": false, // Use tab characters instead of spaces
+	"editor.formatOnSave": true, // Formats the document on save
+	"editor.formatOnType": false, // Formats line on type
+	"editor.formatOnPaste": true,
 }

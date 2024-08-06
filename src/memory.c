@@ -19,11 +19,12 @@ void *reallocate(void *pointer, size_t oldSize, size_t newSize)
 	return result;
 }
 
-static void freeObject(Obj* object)  {
+static void freeObject(Obj *object)
+{
 	switch (object->type)
 	{
 	case OBJ_STRING:
-		ObjString* str = (ObjString*) object;
+		ObjString *str = (ObjString *)object;
 		FREE_ARRAY(char, str->chars, str->length + 1);
 		FREE(ObjString, object); // TODO: Is this equivalent to free str?
 		break;
@@ -33,11 +34,13 @@ static void freeObject(Obj* object)  {
 	}
 }
 
-void freeObjects() {
-	Obj* obj = vm.objects;
+void freeObjects()
+{
+	Obj *obj = vm.objects;
 
-	while (obj != NULL) {
-		Obj* next = obj->next;
+	while (obj != NULL)
+	{
+		Obj *next = obj->next;
 		freeObject(obj);
 		obj = next;
 	}
