@@ -24,6 +24,7 @@ void freeTable(Table *table)
 static Entry *findEntry(Entry *entries, int capacity, ObjString *key)
 {
 	uint32_t index = key->hash % capacity;
+	Entry *tombstone = NULL;
 
 	for (;;)
 	{
@@ -62,31 +63,31 @@ void tableAddAll(Table *from, Table *to)
 	}
 }
 
-static void adjustCapacity(Table *table, int capacity)
+static void adjustCapacity(Table *table, int newCapacity)
 {
-	Entry *entries = ALLOCATE(Entry, capacity);
-	for (int i = 0; i < capacity; i++)
+	Entry *newEntries = ALLOCATE(Entry, newCapacity);
+	for (int i = 0; i < newCapacity; i++)
 	{
-		entries[i].key = NULL;
-		entries[i].value = NIL_VAL;
+		newEntries[i].key = NULL;
+		newEntries[i].value = NIL_VAL;
 	}
 
-	// TODO:
+	// Walk old list, inserting all it's non-null values into new list
 	for (int i = 0; i < table->capacity; i++)
 	{
-		Entry *entry = &table->entries[i];
-		if (entry->key == NULL)
+		Entry *oldEntry = &table->entries[i];
+		if (oldEntry->key == NULL)
 			continue;
 
-		Entry *dest = findEntry(entries, capacity, entry->key);
-		dest->key = entry->key;
-		dest->value = entry->value;
+		Entry *dest = findEntry(newEntries, newCapacity, oldEntry->key);
+		dest->key = oldEntry->key;
+		dest->value = oldEntry->value;
 	}
 
 	FREE_ARRAY(Entry, table->entries, table->capacity);
 
-	table->entries = entries;
-	table->capacity = capacity;
+	table->entries = newEntries;
+	table->capacity = newCapacity;
 }
 
 bool tableSet(Table *table, ObjString *key, Value value)
@@ -106,4 +107,8 @@ bool tableSet(Table *table, ObjString *key, Value value)
 	entry->key = key;
 	entry->value = value;
 	return isNewKey;
+}
+
+bool tableDelete(Table *table, ObjString *key)
+{
 }
