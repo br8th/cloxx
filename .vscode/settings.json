@@ -10,4 +10,8 @@
 	"editor.formatOnSave": true, // Formats the document on save
 	"editor.formatOnType": false, // Formats line on type
 	"editor.formatOnPaste": true,
+	"editor.renderWhitespace": "all",
+	"editor.rulers": [
+		80,
+	]
 }

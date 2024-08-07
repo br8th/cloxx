@@ -29,8 +29,25 @@ static Entry *findEntry(Entry *entries, int capacity, ObjString *key)
 	for (;;)
 	{
 		Entry *entry = &entries[index];
-		if (entry->key == key || entry->key == NULL)
+		if (entry->key == NULL)
 		{
+			// The entry is either empty or a tombstone.
+			if (IS_NIL(entry->value))
+			{
+				// This is truly an empty entry.
+				// If we've found a tombstone before, reuse it instead.
+				return tombstone != NULL ? tombstone : entry;
+			}
+			else
+			{
+				// We found a tombstone. Note that we don't return yet.
+				if (tombstone == NULL)
+					tombstone = entry;
+			}
+		}
+		else if (entry->key == key)
+		{
+			// We found the key.
 			return entry;
 		}
 
@@ -63,6 +80,34 @@ void tableAddAll(Table *from, Table *to)
 	}
 }
 
+ObjString *tableFindString(Table *table, const char *chars, int length,
+						   uint32_t hash)
+{
+	if (table->count == 0)
+		return NULL;
+
+	uint32_t index = hash % table->capacity;
+	for (;;)
+	{
+		Entry *entry = &table->entries[index];
+		if (entry->key == NULL)
+		{
+			// Stop if we find an empty non-tombstone entry.
+			if (IS_NIL(entry->value))
+				return NULL;
+		}
+		else if (entry->key->length == length &&
+				 entry->key->hash == hash &&
+				 memcmp(entry->key->chars, chars, length) == 0)
+		{
+			// We found it.
+			return entry->key;
+		}
+
+		index = (index + 1) % table->capacity;
+	}
+}
+
 static void adjustCapacity(Table *table, int newCapacity)
 {
 	Entry *newEntries = ALLOCATE(Entry, newCapacity);
@@ -71,6 +116,8 @@ static void adjustCapacity(Table *table, int newCapacity)
 		newEntries[i].key = NULL;
 		newEntries[i].value = NIL_VAL;
 	}
+
+	table->count = 0;
 
 	// Walk old list, inserting all it's non-null values into new list
 	for (int i = 0; i < table->capacity; i++)
@@ -82,6 +129,8 @@ static void adjustCapacity(Table *table, int newCapacity)
 		Entry *dest = findEntry(newEntries, newCapacity, oldEntry->key);
 		dest->key = oldEntry->key;
 		dest->value = oldEntry->value;
+
+		table->count++;
 	}
 
 	FREE_ARRAY(Entry, table->entries, table->capacity);
@@ -101,7 +150,9 @@ bool tableSet(Table *table, ObjString *key, Value value)
 	Entry *entry = findEntry(table->entries, table->capacity, key);
 
 	bool isNewKey = entry->key == NULL;
-	if (isNewKey)
+
+	// Only increase count if we are not inserting into a tombstone.
+	if (isNewKey && IS_NIL(entry->value))
 		table->count++;
 
 	entry->key = key;
@@ -111,4 +162,16 @@ bool tableSet(Table *table, ObjString *key, Value value)
 
 bool tableDelete(Table *table, ObjString *key)
 {
+	if (table->count == 0)
+		return false;
+
+	// Find the entry.
+	Entry *entry = findEntry(table->entries, table->capacity, key);
+	if (entry->key == NULL)
+		return false;
+
+	// Place a tombstone in the entry.
+	entry->key = NULL;
+	entry->value = BOOL_VAL(true);
+	return true;
 }

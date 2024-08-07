@@ -19,6 +19,7 @@ void initVM()
 {
 	vm.objects = NULL;
 	resetStack();
+	initTable(&vm.strings);
 }
 
 static void runtimeError(const char *format, ...)
@@ -199,6 +200,7 @@ static InterpretResult run()
 
 void freeVM()
 {
+	freeTable(&vm.strings);
 	freeObjects();
 }
 
