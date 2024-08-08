@@ -26,12 +26,11 @@ struct ObjString
 {
 	Obj obj;
 	int length;
-	char *chars; // The string without quotes, or null byte
 	uint32_t hash;
+	char chars[]; // The string without quotes, or null byte
 };
 
-ObjString *takeString(char *chars, int length);
-ObjString *copyString(const char *chars, int length);
+ObjString *allocateString(const char *chars, int length);
 
 static inline bool isObjType(Value value, ObjType type)
 {

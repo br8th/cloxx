@@ -30,16 +30,6 @@ static Obj *allocateObject(size_t size, ObjType type)
 	return object;
 }
 
-static ObjString *allocateString(char *chars, int length, uint32_t hash)
-{
-	ObjString *string = ALLOCATE_OBJ(ObjString, OBJ_STRING);
-	string->length = length;
-	string->chars = chars;
-	string->hash = hash;
-	tableSet(&vm.strings, string, NIL_VAL);
-	return string;
-}
-
 // FNV-1a
 static uint32_t hashString(const char *key, int length)
 {
@@ -52,21 +42,7 @@ static uint32_t hashString(const char *key, int length)
 	return hash;
 }
 
-// TODO:
-ObjString *takeString(char *chars, int length)
-{
-	uint32_t hash = hashString(chars, length);
-	ObjString *interned = tableFindString(&vm.strings, chars, length, hash);
-	if (interned != NULL)
-	{
-		FREE_ARRAY(char, chars, length + 1);
-		return interned;
-	}
-	return allocateString(chars, length, hash);
-}
-
-// TODO:-
-ObjString *copyString(const char *chars, int length)
+ObjString *allocateString(const char *chars, int length)
 {
 	uint32_t hash = hashString(chars, length);
 
@@ -74,9 +50,15 @@ ObjString *copyString(const char *chars, int length)
 	if (interned != NULL)
 		return interned;
 
-	char *heapChars = ALLOCATE(char, length + 1);
-	memcpy(heapChars, chars, length);
-	heapChars[length] = '\0';
+	ObjString *string = (ObjString *)
+		allocateObject(sizeof(ObjString) + length + 1, OBJ_STRING);
 
-	return allocateString(heapChars, length, hash);
+	memcpy(string->chars, chars, length);
+	string->chars[length] = '\0';
+
+	string->hash = hash;
+	string->length = length;
+
+	tableSet(&vm.strings, string, NIL_VAL);
+	return string;
 }

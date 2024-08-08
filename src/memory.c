@@ -25,8 +25,8 @@ static void freeObject(Obj *object)
 	{
 	case OBJ_STRING:
 		ObjString *str = (ObjString *)object;
-		FREE_ARRAY(char, str->chars, str->length + 1);
-		FREE(ObjString, object); // TODO: Is this equivalent to free str?
+		FREE_ARRAY(char, str->chars, str->length + 1); // include '\0'
+		FREE(ObjString, object);					   // TODO: Is this equivalent to free str?
 		break;
 
 	default:
