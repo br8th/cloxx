@@ -64,17 +64,16 @@ static void concatenate()
 	ObjString *b = AS_STRING(pop());
 	ObjString *a = AS_STRING(pop());
 
-	// objstrings are stored without the null bytes.
+	// objstrings are stored with the null byte, but it's not part of the length.
 	int length = a->length + b->length;
 
-	char *chars = ALLOCATE(char, length + 1);
+	char *chars = ALLOCATE(char, length);
 	memcpy(chars, a->chars, a->length);
 	memcpy(chars + a->length, b->chars, b->length);
 
-	chars[length] = '\0';
-
-	ObjString *res = takeString(chars, length);
+	ObjString *res = allocateString(chars, length);
 	push(OBJ_VAL(res));
+	FREE_ARRAY(char, chars, length);
 }
 
 static InterpretResult run()
