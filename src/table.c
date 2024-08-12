@@ -55,6 +55,7 @@ static Entry *findEntry(Entry *entries, int capacity, ObjString *key)
 	}
 }
 
+// TODO:
 bool tableGet(Table *table, ObjString *key, Value *value)
 {
 	if (table->count == 0)
@@ -139,6 +140,7 @@ static void adjustCapacity(Table *table, int newCapacity)
 	table->capacity = newCapacity;
 }
 
+// Note that this returns true if we inserted a new key, and false if we updated an existing one.
 bool tableSet(Table *table, ObjString *key, Value value)
 {
 	if (table->count + 1 > table->capacity * TABLE_MAX_LOAD)

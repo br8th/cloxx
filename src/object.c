@@ -42,6 +42,8 @@ static uint32_t hashString(const char *key, int length)
 	return hash;
 }
 
+// Create a string obj* from a char*, and interns it.
+// Return the interned string if it already exists.
 ObjString *allocateString(const char *chars, int length)
 {
 	uint32_t hash = hashString(chars, length);

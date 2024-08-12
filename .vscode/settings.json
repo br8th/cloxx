@@ -2,6 +2,7 @@
 	"files.associations": {
 		"*.c": "c",
 		"*.h": "c",
+		"*.make": "makefile",
 		"Makefile": "makefile"
 	},
 	"editor.detectIndentation": false, // Disable automatic detection of indentation
@@ -13,5 +14,22 @@
 	"editor.renderWhitespace": "all",
 	"editor.rulers": [
 		80,
-	]
+	],
+	"[dart]": {
+		// Automatically format code on save and during typing of certain characters
+		// (like `;` and `}`).
+		"editor.formatOnType": true,
+		// Disables built-in highlighting of words that match your selection. Without
+		// this, all instances of the selected text will be highlighted, interfering
+		// with Dart's ability to highlight only exact references to the selected variable.
+		"editor.selectionHighlight": false,
+		// Allows pressing <TAB> to complete snippets such as `for` even when the
+		// completion list is not visible.
+		"editor.tabCompletion": "onlySnippets",
+		// By default, VS Code will populate code completion with words found in the
+		// matching documents when a language service does not provide its own completions.
+		// This results in code completion suggesting words when editing comments and
+		// strings. This setting will prevent that.
+		"editor.wordBasedSuggestions": "off",
+	}
 }

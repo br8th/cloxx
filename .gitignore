@@ -50,3 +50,19 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+## Dart
+
+# Files and directories created by pub
+.dart_tool/
+.packages
+
+# If you're building an application, you may want to check-in your pubspec.lock
+pubspec.lock
+
+## End Dart
+
+build/
+
+cloxx
+cloxxd

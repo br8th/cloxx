@@ -80,7 +80,7 @@ int main(int argc, const char *argv[])
 	}
 	else
 	{
-		fprintf(stderr, "Usage: clox [path]\n");
+		fprintf(stderr, "Usage: cloxx [path]\n");
 		exit(64);
 	}
 

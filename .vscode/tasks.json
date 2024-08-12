@@ -1,50 +1,67 @@
 {
-    "version": "2.0.0",
-    "tasks": [
-        {
-            "label": "build cloxx",
-            "type": "shell",
-            "command": "make",
-            "args": [
-                "debug"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-            "presentation": {
-                "reveal": "always",
-                "focus": true,
-                "panel": "shared",
-                "clear": true,
-            },
-            //"problemMatcher": "$msCompile"
-            "problemMatcher": [
-                "$gcc",
-            ],
-            "detail": "Uses the make file to build cloxx in debug mode."
-            // "options": {
-            //     "cwd": "${fileDirname}"
-            // },
-        },
-        {
-            "label": "clean cloxx",
-            "type": "shell",
-            "command": "make",
-            "args": [
-                "clean"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": false
-            },
-            "presentation": {
-                "reveal": "silent"
-            },
-            "problemMatcher": [
-                "$gcc",
-            ],
-            "detail": "Runs make clean after debug session."
-        },
-    ]
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "build cloxx",
+			"type": "shell",
+			"command": "make",
+			"args": [
+				"debug"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"presentation": {
+				"reveal": "always",
+				"focus": true,
+				"panel": "shared",
+				"clear": true,
+			},
+			//"problemMatcher": "$msCompile"
+			"problemMatcher": [
+				"$gcc",
+			],
+			"detail": "Uses the make file to build cloxx in debug mode."
+			// "options": {
+			//     "cwd": "${fileDirname}"
+			// },
+		},
+		{
+			"label": "clean cloxx",
+			"type": "shell",
+			"command": "make",
+			"args": [
+				"clean"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": false
+			},
+			"presentation": {
+				"reveal": "silent"
+			},
+			"problemMatcher": [
+				"$gcc",
+			],
+			"detail": "Runs make clean after debug session."
+		},
+		{
+			"label": "build test snapshot",
+			"type": "shell",
+			"command": "dart",
+			"args": [
+				"--snapshot=build/test.dart.snapshot", // Specify the output snapshot file
+				"--snapshot-kind=app-jit", // Use the app-jit snapshot kind
+				"tool/bin/test.dart", // The Dart script to compile
+				"c"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": false
+			},
+			"problemMatcher": [],
+			"detail": "Build task to generate a Dart snapshot."
+		}
+	]
 }
