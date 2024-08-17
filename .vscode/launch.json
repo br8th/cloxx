@@ -30,6 +30,20 @@
 			"postDebugTask": "clean cloxx"
 		},
 		{
+			"name": "Dart: Lox test runner with args",
+			"request": "launch",
+			"type": "dart",
+			"program": "${workspaceFolder}/tool/bin/test.dart",
+			"cwd": "${workspaceFolder}/tool/",
+			"args": [
+				"cloxx",
+				"c"
+			],
+			"console": "terminal",
+			//"console": "debugConsole",
+			"restart": true
+		},
+		{
 			// A name for the launch config. This will show in the dropdown on the Run side bar.
 			"name": "Lox tests",
 			// This should always be "dart" for Dart/Flutter apps.

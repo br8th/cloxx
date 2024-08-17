@@ -24,13 +24,12 @@ var _failed = 0;
 var _skipped = 0;
 var _expectations = 0;
 
-Suite _suite;
-String _filterPath;
-String _customInterpreter;
-List<String> _customArguments;
+Suite? _suite;
+String? _filterPath;
+String? _customInterpreter;
+List<String>? _customArguments;
 
 final _allSuites = <String, Suite>{};
-final _cSuites = <String>[];
 
 class Suite {
   final String name;
@@ -77,8 +76,6 @@ void main(List<String> arguments) {
 
   if (suite == "all") {
     _runSuites(_allSuites.keys.toList());
-  } else if (suite == "c") {
-    _runSuites(_cSuites);
   } else if (!_allSuites.containsKey(suite)) {
     print("Unknown interpreter '$suite'");
     exit(1);
@@ -142,7 +139,7 @@ void _runTest(String path) {
   // Check if we are just running a subset of the tests.
   if (_filterPath != null) {
     var thisTest = p.posix.relative(path, from: "test");
-    if (!thisTest.startsWith(_filterPath)) return;
+    if (!thisTest.startsWith(_filterPath!)) return;
   }
 
   // Update the status line.
@@ -189,7 +186,7 @@ class Test {
   final _expectedErrors = <String>{};
 
   /// The expected runtime error message or `null` if there should not be one.
-  String _expectedRuntimeError;
+  String? _expectedRuntimeError;
 
   /// If there is an expected runtime error, the line it should occur on.
   int _runtimeErrorLine = 0;
@@ -205,7 +202,7 @@ class Test {
     // Get the path components.
     var parts = _path.split("/");
     var subpath = "";
-    String state;
+    String? state;
 
     // Figure out the state of the test. We don't break out of this loop because
     // we want lines for more specific paths to override more general ones.
@@ -213,8 +210,8 @@ class Test {
       if (subpath.isNotEmpty) subpath += "/";
       subpath += part;
 
-      if (_suite.tests.containsKey(subpath)) {
-        state = _suite.tests[subpath];
+      if (_suite!.tests.containsKey(subpath)) {
+        state = _suite!.tests[subpath];
       }
     }
 
@@ -235,7 +232,7 @@ class Test {
 
       match = _expectedOutputPattern.firstMatch(line);
       if (match != null) {
-        _expectedOutput.add(ExpectedOutput(lineNum, match[1]));
+        _expectedOutput.add(ExpectedOutput(lineNum, match[1]!));
         _expectations++;
         continue;
       }
@@ -272,7 +269,7 @@ class Test {
       match = _expectedRuntimeErrorPattern.firstMatch(line);
       if (match != null) {
         _runtimeErrorLine = lineNum;
-        _expectedRuntimeError = match[1];
+        _expectedRuntimeError = match[1]!;
         // If we expect a runtime error, it should exit with EX_SOFTWARE.
         _expectedExitCode = 70;
         _expectations++;
@@ -292,11 +289,17 @@ class Test {
 
   /// Invoke the interpreter and run the test.
   List<String> run() {
+    if (_suite == null) {
+      throw "No suite set for test.";
+    }
+
     var args = [
-      if (_customInterpreter != null) ...?_customArguments else ..._suite.args,
+      if (_customInterpreter != null) ...?_customArguments else ..._suite!.args,
       _path
     ];
-    var result = Process.runSync(_customInterpreter ?? _suite.executable, args);
+
+    var result =
+        Process.runSync(_customInterpreter ?? _suite!.executable, args);
 
     // Normalize Windows line endings.
     var outputLines = const LineSplitter().convert(result.stdout as String);
@@ -326,7 +329,7 @@ class Test {
     }
 
     // Make sure the stack trace has the right line.
-    RegExpMatch match;
+    RegExpMatch? match;
     var stackLines = errorLines.sublist(1);
     for (var line in stackLines) {
       match = _stackTracePattern.firstMatch(line);
@@ -336,7 +339,7 @@ class Test {
     if (match == null) {
       fail("Expected stack trace and got:", stackLines);
     } else {
-      var stackLine = int.parse(match[1]);
+      var stackLine = int.parse(match[1]!);
       if (stackLine != _runtimeErrorLine) {
         fail("Expected runtime error on line $_runtimeErrorLine "
             "but was on line $stackLine.");
@@ -421,7 +424,7 @@ class Test {
     }
   }
 
-  void fail(String message, [List<String> lines]) {
+  void fail(String message, [List<String>? lines]) {
     _failures.add(message);
     if (lines != null) _failures.addAll(lines);
   }
@@ -431,7 +434,6 @@ void _defineTestSuites() {
   void c(String name, Map<String, String> tests) {
     var executable = name == "cloxx" ? "build/cloxxd" : "build/$name";
     _allSuites[name] = Suite(name, executable, [], tests);
-    _cSuites.add(name);
   }
 
   // These are just for earlier chapters.
