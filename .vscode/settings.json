@@ -15,6 +15,9 @@
 	"editor.rulers": [
 		80,
 	],
+	"dart.sdkPaths": [
+		"~/.dvm/darts/"
+	],
 	"[dart]": {
 		// Automatically format code on save and during typing of certain characters
 		// (like `;` and `}`).

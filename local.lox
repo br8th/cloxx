@@ -1,0 +1,12 @@
+var a = "globs";
+print a;
+
+{
+	var a = "ins 1.";
+	print a;
+
+	{
+		var a = "ins 2.";
+		print a;
+	}
+}

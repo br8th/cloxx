@@ -171,6 +171,18 @@ static InterpretResult run()
 			pop();
 			break;
 		}
+		case OP_SET_GLOBAL:
+		{
+			// update the var if already exists, throw an error othwerwise.
+			ObjString *name = READ_STRING();
+			if (tableSet(&vm.globals, name, peek(0)))
+			{
+				tableDelete(&vm.globals, name);
+				runtimeError("Undefined variable '%s'.", name->chars);
+				return INTERPRET_RUNTIME_ERROR;
+			}
+			break;
+		}
 		case OP_GET_GLOBAL:
 		{
 			ObjString *name = READ_STRING();
@@ -183,16 +195,16 @@ static InterpretResult run()
 			push(value);
 			break;
 		}
-		case OP_SET_GLOBAL:
+		case OP_SET_LOCAL:
 		{
-			// update the var if already exists, throw an error othwerwise.
-			ObjString *name = READ_STRING();
-			if (tableSet(&vm.globals, name, peek(0)))
-			{
-				tableDelete(&vm.globals, name);
-				runtimeError("Undefined variable '%s'.", name->chars);
-				return INTERPRET_RUNTIME_ERROR;
-			}
+			uint8_t slot = READ_BYTE();
+			vm.stack[slot] = peek(0);
+			break;
+		}
+		case OP_GET_LOCAL:
+		{
+			uint8_t slot = READ_BYTE();
+			push(vm.stack[slot]);
 			break;
 		}
 		case OP_EQUAL:
@@ -228,7 +240,7 @@ static InterpretResult run()
 		{
 			printValue(pop());
 			printf("\n");
-			return INTERPRET_OK;
+			break;
 		}
 		case OP_NOT:
 		{

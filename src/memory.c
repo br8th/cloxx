@@ -24,9 +24,9 @@ static void freeObject(Obj *object)
 	switch (object->type)
 	{
 	case OBJ_STRING:
-		ObjString *str = (ObjString *)object;
-		FREE_ARRAY(char, str->chars, str->length + 1); // include '\0'
-		FREE(ObjString, object);					   // TODO: Is this equivalent to free str?
+		// ObjString *str = (ObjString *)object;
+		// FREE_ARRAY(char, str->chars, str->length + 1); // include '\0'
+		FREE(ObjString, object);
 		break;
 
 	default:
