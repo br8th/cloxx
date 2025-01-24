@@ -227,6 +227,11 @@ static void initCompiler(Compiler *compiler, FunctionType type)
 
 	current = compiler;
 
+	Local *local = &current->locals[current->localCount++];
+	local->depth = 0;
+	local->name.start = "";
+	local->name.length = 0;
+
 	if (type != TYPE_SCRIPT)
 	{
 		current->function->name = allocateString(parser.previous.start,
@@ -918,7 +923,7 @@ static void statement()
 	}
 }
 
-bool compile(const char *source)
+ObjFunction *compile(const char *source)
 {
 	initScanner(source);
 
