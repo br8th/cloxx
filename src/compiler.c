@@ -693,14 +693,15 @@ static void function(FunctionType type)
 	emitBytes(OP_CONSTANT, makeConstant(OBJ_VAL(function)));
 }
 
+/*
 static void method()
 {
-}
 
 static void classDeclaration()
 {
 	consume(TOKEN_IDENTIFIER, "Expect class name.");
 }
+}*/
 
 static void funDeclaration()
 {
