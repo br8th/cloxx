@@ -54,8 +54,10 @@ typedef enum
 	TYPE_SCRIPT
 } FunctionType;
 
-typedef struct
+// forward declaration because of circular dependency.
+typedef struct Compiler
 {
+	struct Compiler *enclosing;
 	ObjFunction *function;
 	FunctionType type;
 
@@ -217,6 +219,7 @@ static void patchJump(int offset)
 
 static void initCompiler(Compiler *compiler, FunctionType type)
 {
+	compiler->enclosing = current;
 	compiler->function = NULL;
 	compiler->type = type;
 	compiler->localCount = 0;
@@ -239,7 +242,7 @@ static void initCompiler(Compiler *compiler, FunctionType type)
 	}
 }
 
-static void endCompiler()
+ObjFunction *endCompiler()
 {
 	emitReturn();
 
@@ -253,6 +256,8 @@ static void endCompiler()
 											 : "<script>");
 	}
 #endif
+
+	current = current->enclosing;
 
 	return function;
 }
@@ -402,6 +407,27 @@ static void binary(bool canAssign)
 	default:
 		return; // Unreachable.
 	}
+}
+
+static uint8_t argumentList()
+{
+	uint8_t argCount = 0;
+	if (!check(TOKEN_RIGHT_PAREN))
+	{
+		do
+		{
+			expression();
+
+			if (argCount == 255)
+			{
+				error("Can't have more than 255 arguments.");
+			}
+
+			argCount++;
+		} while (match(TOKEN_COMMA));
+	}
+	consume(TOKEN_RIGHT_PAREN, "Expect ')' after arguments.");
+	return argCount;
 }
 
 static void literal(bool canAssign)
@@ -596,9 +622,11 @@ static uint8_t parseVariable(char *errorMessage)
 
 static void markInitialized()
 {
+	// global scope. Does not require initialization.
 	if (current->scopeDepth == 0)
 		return;
 
+	// set the depth of the last local variable to the current scope depth.
 	current->locals[current->localCount - 1].depth =
 		current->scopeDepth;
 }
@@ -613,27 +641,6 @@ static void defineVariable(uint8_t global)
 	}
 
 	emitBytes(OP_DEFINE_GLOBAL, global);
-}
-
-static uint8_t argumentList()
-{
-	uint8_t argCount = 0;
-	if (!check(TOKEN_RIGHT_PAREN))
-	{
-		do
-		{
-			expression();
-
-			if (argCount == 255)
-			{
-				error("Can't have more than 255 arguments.");
-			}
-
-			argCount++;
-		} while (match(TOKEN_COMMA));
-	}
-	consume(TOKEN_RIGHT_PAREN, "Expect ')' after arguments.");
-	return argCount;
 }
 
 static ParseRule *getRule(TokenType type)
@@ -656,8 +663,34 @@ static void block()
 	consume(TOKEN_RIGHT_BRACE, "Expect '}' after block.");
 }
 
-static void function()
+static void function(FunctionType type)
 {
+	Compiler compiler;
+	initCompiler(&compiler, type);
+	beginScope();
+
+	consume(TOKEN_LEFT_PAREN, "Expect '(' after function name.");
+
+	if (!check(TOKEN_RIGHT_PAREN))
+	{
+		do
+		{
+			current->function->arity++;
+			if (current->function->arity > 255)
+			{
+				errorAtCurrent("Can't have more than 255 parameters.");
+			}
+			uint8_t constant = parseVariable("Expect parameter name.");
+			defineVariable(constant);
+		} while (match(TOKEN_COMMA));
+	}
+
+	consume(TOKEN_RIGHT_PAREN, "Expect ')' after parameters.");
+	consume(TOKEN_LEFT_BRACE, "Expect '{' before function body.");
+	block();
+
+	ObjFunction *function = endCompiler();
+	emitBytes(OP_CONSTANT, makeConstant(OBJ_VAL(function)));
 }
 
 static void method()
@@ -671,6 +704,13 @@ static void classDeclaration()
 
 static void funDeclaration()
 {
+	uint8_t global = parseVariable("Expect function name.");
+
+	// Mark the function's name as initialized, before we compile the body.
+	// This allows the function to recursively call itself, without error.
+	markInitialized();
+	function(TYPE_FUNCTION);
+	defineVariable(global);
 }
 
 static void varDeclaration()
@@ -929,8 +969,6 @@ ObjFunction *compile(const char *source)
 
 	Compiler compiler;
 	initCompiler(&compiler, TYPE_SCRIPT);
-
-	compilingChunk = chunk;
 
 	parser.hadError = false;
 	parser.panicMode = false;

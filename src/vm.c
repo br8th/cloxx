@@ -24,15 +24,6 @@ static void resetStack()
 	vm.frameCount = 0;
 }
 
-void initVM()
-{
-	vm.objects = NULL;
-	resetStack();
-	initTable(&vm.strings);
-	initTable(&vm.globals);
-	defineNative("clock", clockNative);
-}
-
 static void runtimeError(const char *format, ...)
 {
 	va_list args;
@@ -49,6 +40,24 @@ static void runtimeError(const char *format, ...)
 	fprintf(stderr, "[line %d] in script\n", line);
 
 	resetStack();
+}
+
+static void defineNative(const char *name, NativeFn function)
+{
+	push(OBJ_VAL(allocateString(name, (int)strlen(name))));
+	push(OBJ_VAL(newNative(function)));
+	tableSet(&vm.globals, AS_STRING(vm.stack[0]), vm.stack[1]);
+	pop();
+	pop();
+}
+
+void initVM()
+{
+	vm.objects = NULL;
+	resetStack();
+	initTable(&vm.strings);
+	initTable(&vm.globals);
+	defineNative("clock", clockNative);
 }
 
 void push(Value value)
@@ -84,6 +93,11 @@ static bool call(ObjFunction *function, int argCount)
 		return false;
 	}
 
+	CallFrame *frame = &vm.frames[vm.frameCount++];
+	frame->function = function;
+	frame->ip = function->chunk.code;
+	frame->slots = vm.stackTop - argCount - 1;
+
 	return true;
 }
 
@@ -99,9 +113,19 @@ static bool callValue(Value callee, int argCount)
 	{
 	case OBJ_FUNCTION:
 		return call(AS_FUNCTION(callee), argCount);
+	case OBJ_NATIVE:
+	{
+		NativeFn native = AS_NATIVE(callee);
+		Value result = native(argCount, vm.stackTop - argCount);
+		vm.stackTop -= argCount + 1;
+		push(result);
+		return true;
+	}
 	default:
 		break; // Non-callable object type.
 	}
+
+	return false;
 }
 
 static bool isFalsey(Value value)
@@ -312,11 +336,25 @@ static InterpretResult run()
 			{
 				return INTERPRET_RUNTIME_ERROR;
 			}
+
+			// TODO:
+			frame = &vm.frames[vm.frameCount - 1];
 			break;
 		}
 		case OP_RETURN:
 		{
-			return INTERPRET_OK;
+			Value result = pop();
+			vm.frameCount--;
+			if (vm.frameCount == 0)
+			{
+				pop();
+				return INTERPRET_OK;
+			}
+
+			vm.stackTop = frame->slots;
+			push(result);
+			frame = &vm.frames[vm.frameCount - 1];
+			break;
 		}
 		case OP_PRINT:
 		{
@@ -352,12 +390,8 @@ InterpretResult interpret(const char *source)
 		return INTERPRET_COMPILE_ERROR;
 
 	push(OBJ_VAL(function));
-	CallFrame *frame = &vm.frames[vm.frameCount++];
-	frame->function = function;
-	frame->ip = function->chunk.code;
-	frame->slots = vm.stack;
 
-	InterpretResult result = run();
+	call(function, 0);
 
-	return result;
+	return run();
 }

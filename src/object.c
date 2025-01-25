@@ -9,22 +9,6 @@
 #define ALLOCATE_OBJ(type, objectType) \
 	(type *)allocateObject(sizeof(type), objectType)
 
-void printObject(Value value)
-{
-	switch (OBJ_TYPE(value))
-	{
-	case OBJ_STRING:
-		printf("%s", AS_CSTRING(value));
-		break;
-	case OBJ_FUNCTION:
-		printFunction(AS_FUNCTION(value));
-		break;
-	case OBJ_NATIVE:
-		printf("<native fn>");
-		break;
-	}
-}
-
 static Obj *allocateObject(size_t size, ObjType type)
 {
 	Obj *object = (Obj *)reallocate(NULL, 0, size);
@@ -96,4 +80,20 @@ static void printFunction(ObjFunction *function)
 	}
 
 	printf("<fn %s>", function->name->chars);
+}
+
+void printObject(Value value)
+{
+	switch (OBJ_TYPE(value))
+	{
+	case OBJ_STRING:
+		printf("%s", AS_CSTRING(value));
+		break;
+	case OBJ_FUNCTION:
+		printFunction(AS_FUNCTION(value));
+		break;
+	case OBJ_NATIVE:
+		printf("<native fn>");
+		break;
+	}
 }
