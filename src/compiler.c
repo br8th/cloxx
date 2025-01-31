@@ -351,6 +351,12 @@ static void declareVariable()
 	for (int i = current->localCount; i >= 0; i--)
 	{
 		Local *local = &current->locals[i];
+
+		if (local->depth != -1 && local->depth < current->scopeDepth)
+		{
+			break;
+		}
+
 		if (identifiersEqual(&local->name, name))
 		{
 			error("Already a variable with this name in this scope.");
@@ -622,7 +628,7 @@ static uint8_t parseVariable(char *errorMessage)
 
 static void markInitialized()
 {
-	// global scope. Does not require initialization.
+	// global scope. These variables are late bound.
 	if (current->scopeDepth == 0)
 		return;
 
@@ -634,6 +640,7 @@ static void markInitialized()
 // Takes the index of the global variable identifier in the globals table.
 static void defineVariable(uint8_t global)
 {
+	// local variable
 	if (current->scopeDepth > 0)
 	{
 		markInitialized();
@@ -667,6 +674,7 @@ static void function(FunctionType type)
 {
 	Compiler compiler;
 	initCompiler(&compiler, type);
+	// No end scope
 	beginScope();
 
 	consume(TOKEN_LEFT_PAREN, "Expect '(' after function name.");

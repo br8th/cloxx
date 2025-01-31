@@ -1,0 +1,8 @@
+fun f0() { return 0; }
+print f0(); // expect: 0
+
+fun f1(a) { return a; }
+print f1(1); // expect: 1
+
+fun f2(a, b) { return a + b; }
+print f2(1, 2); // expect: 3
