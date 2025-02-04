@@ -348,7 +348,7 @@ static void declareVariable()
 
 	Token *name = &parser.previous;
 
-	for (int i = current->localCount; i >= 0; i--)
+	for (int i = current->localCount - 1; i >= 0; i--)
 	{
 		Local *local = &current->locals[i];
 

@@ -59,10 +59,9 @@
 			"request": "launch",
 			"type": "dart",
 			"program": "${workspaceFolder}/tool/bin/test.dart",
-			"cwd": "${workspaceFolder}/tool/",
+			"cwd": "${workspaceFolder}",
 			"args": [
-				"cloxx",
-				"c"
+				"chap24_calls",
 			],
 			"console": "terminal",
 			//"console": "debugConsole",

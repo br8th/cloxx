@@ -11,4 +11,6 @@
 
 #endif
 
-// #undef DEBUG_TRACE_EXECUTION
+// When running tests, we compare the output of the program to the expected output.
+#undef DEBUG_PRINT_CODE
+#undef DEBUG_TRACE_EXECUTION
