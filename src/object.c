@@ -9,16 +9,6 @@
 #define ALLOCATE_OBJ(type, objectType) \
 	(type *)allocateObject(sizeof(type), objectType)
 
-void printObject(Value value)
-{
-	switch (OBJ_TYPE(value))
-	{
-	case OBJ_STRING:
-		printf("%s", AS_CSTRING(value));
-		break;
-	}
-}
-
 static Obj *allocateObject(size_t size, ObjType type)
 {
 	Obj *object = (Obj *)reallocate(NULL, 0, size);
@@ -28,6 +18,23 @@ static Obj *allocateObject(size_t size, ObjType type)
 	object->next = vm.objects;
 	vm.objects = object;
 	return object;
+}
+
+ObjFunction *newFunction()
+{
+	ObjFunction *function = ALLOCATE_OBJ(ObjFunction, OBJ_FUNCTION);
+	function->arity = 0;
+	function->name = NULL;
+	initChunk(&function->chunk);
+	return function;
+}
+
+ObjNative *newNative(NativeFn function, int arity)
+{
+	ObjNative *native = ALLOCATE_OBJ(ObjNative, OBJ_NATIVE);
+	native->function = function;
+	native->arity = arity;
+	return native;
 }
 
 // FNV-1a
@@ -63,4 +70,31 @@ ObjString *allocateString(const char *chars, int length)
 
 	tableSet(&vm.strings, string, NIL_VAL);
 	return string;
+}
+
+static void printFunction(ObjFunction *function)
+{
+	if (function->name == NULL)
+	{
+		printf("<script>");
+		return;
+	}
+
+	printf("<fn %s>", function->name->chars);
+}
+
+void printObject(Value value)
+{
+	switch (OBJ_TYPE(value))
+	{
+	case OBJ_STRING:
+		printf("%s", AS_CSTRING(value));
+		break;
+	case OBJ_FUNCTION:
+		printFunction(AS_FUNCTION(value));
+		break;
+	case OBJ_NATIVE:
+		printf("<native fn>");
+		break;
+	}
 }

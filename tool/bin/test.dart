@@ -77,7 +77,7 @@ void main(List<String> arguments) {
   if (suite == "all") {
     _runSuites(_allSuites.keys.toList());
   } else if (!_allSuites.containsKey(suite)) {
-    print("Unknown interpreter '$suite'");
+    print("Unknown test suite: '$suite'");
     exit(1);
   } else if (!_runSuite(suite)) {
     exit(1);
@@ -432,7 +432,7 @@ class Test {
 
 void _defineTestSuites() {
   void c(String name, Map<String, String> tests) {
-    var executable = name == "cloxx" ? "build/cloxxd" : "build/$name";
+    var executable = "build/cloxx";
     _allSuites[name] = Suite(name, executable, [], tests);
   }
 
@@ -512,7 +512,7 @@ void _defineTestSuites() {
     "test/super": "skip",
   };
 
-  c("cloxx", {
+  c("clox", {
     "test": "pass",
     ...earlyChapters,
   });

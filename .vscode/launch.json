@@ -36,7 +36,7 @@
 			"program": "${workspaceFolder}\\build\\cloxxd",
 			"args": [
 				// "--vm",
-				"${workspaceFolder}/local.lox",
+				"${workspaceFolder}/test/function/basic.lox",
 			],
 			"MIMode": "gdb",
 			"miDebuggerPath": "/usr/bin/gdb",
@@ -59,10 +59,9 @@
 			"request": "launch",
 			"type": "dart",
 			"program": "${workspaceFolder}/tool/bin/test.dart",
-			"cwd": "${workspaceFolder}/tool/",
+			"cwd": "${workspaceFolder}",
 			"args": [
-				"cloxx",
-				"c"
+				"chap24_calls",
 			],
 			"console": "terminal",
 			//"console": "debugConsole",

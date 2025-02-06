@@ -5,6 +5,7 @@
 #include "object.h"
 #include "table.h"
 #include "value.h"
+#include <stdio.h>
 
 #define TABLE_MAX_LOAD 0.75
 
@@ -176,4 +177,18 @@ bool tableDelete(Table *table, ObjString *key)
 	entry->key = NULL;
 	entry->value = BOOL_VAL(true);
 	return true;
+}
+
+void tableDump(Table *table)
+{
+	for (int i = 0; i < table->capacity; i++)
+	{
+		Entry *entry = &table->entries[i];
+		if (entry->key != NULL)
+		{
+			printf("Key: %s, Value: ", entry->key->chars);
+			printValue(entry->value); // assuming you have a function to print a Value
+			printf("\n");
+		}
+	}
 }
