@@ -28,6 +28,18 @@ static void freeObject(Obj *object)
 		// FREE_ARRAY(char, str->chars, str->length + 1); // include '\0'
 		FREE(ObjString, object);
 		break;
+	case OBJ_CLOSURE:
+	{
+		ObjClosure *closure = (ObjClosure *)object;
+
+		FREE(ObjClosure, object);
+		FREE_ARRAY(ObjUpvalue *, closure->upvalues,
+				   closure->upvalueCount);
+		break;
+	}
+	case OBJ_UPVALUE:
+		FREE(ObjUpvalue, object);
+		break;
 	case OBJ_FUNCTION:
 		ObjFunction *func = (ObjFunction *)object;
 		freeChunk(&func->chunk);

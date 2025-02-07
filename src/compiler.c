@@ -77,6 +77,11 @@ static Chunk *currentChunk()
 
 static void errorAt(Token *token, const char *message)
 {
+	if (parser.panicMode)
+		return;
+
+	parser.panicMode = true;
+
 	fprintf(stderr, "[line %d] Error", token->line);
 
 	if (token->type == TOKEN_EOF)
@@ -612,6 +617,11 @@ static void parsePrecedence(Precedence precedence)
 		ParseFn infixRule = getRule(parser.previous.type)->infix;
 		infixRule(canAssign);
 	}
+
+	if (canAssign && match(TOKEN_EQUAL))
+	{
+		error("Invalid assignment target.");
+	}
 }
 
 // Parse the current identifier, and put it in the constants table. Return the index.
@@ -698,7 +708,7 @@ static void function(FunctionType type)
 	block();
 
 	ObjFunction *function = endCompiler();
-	emitBytes(OP_CONSTANT, makeConstant(OBJ_VAL(function)));
+	emitBytes(OP_CLOSURE, makeConstant(OBJ_VAL(function)));
 }
 
 /*

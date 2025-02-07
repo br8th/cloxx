@@ -9,7 +9,11 @@
 
 typedef struct
 {
+	// TODO: Replace func with closure
 	ObjFunction *function;
+
+	ObjClosure *closure;
+
 	uint8_t *ip;
 	Value *slots; // Base of the function's stack frame
 } CallFrame;
